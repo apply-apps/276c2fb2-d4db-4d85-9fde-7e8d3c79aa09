@@ -1,53 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+// Filename: index.js
+// Combined code from all files
 
-const App = () => {
-  const fullText = 'Hi, this is Apply.\nCreating mobile apps is now as simple as typing text.\nJust input your idea and press APPLY, and our platform does the rest...';
-  const [displayedText, setDisplayedText] = useState('');
-  const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, ScrollView, Button, FlatList, View } from 'react-native';
 
-  useEffect(() => {
-    if (isPaused) return;
+const initialWorkouts = [
+  { id: '1', name: 'Push-ups', duration: '20 mins' },
+  { id: '2', name: 'Running', duration: '30 mins' },
+  { id: '3', name: 'Squats', duration: '15 mins' },
+];
 
-    const interval = setInterval(() => {
-      setDisplayedText((prev) => prev + fullText[index]);
-      setIndex((prev) => {
-        if (prev === fullText.length - 1) {
-          setIsPaused(true);
-          setTimeout(() => {
-            setDisplayedText('');
-            setIndex(0);
-            setIsPaused(false);
-          }, 2000);
-          return 0;
-        }
-        return prev + 1;
-      });
-    }, 100);
+const WorkoutList = () => {
+  const [workouts, setWorkouts] = useState(initialWorkouts);
 
-    return () => clearInterval(interval);
-  }, [index, isPaused]);
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{displayedText}</Text>
+  const renderItem = ({ item }) => (
+    <View style={styles.workoutItem}>
+      <Text style={styles.workoutName}>{item.name}</Text>
+      <Text style={styles.workoutDuration}>{item.duration}</Text>
+      <Button title="Complete" onPress={() => handleComplete(item.id)} />
     </View>
   );
+
+  const handleComplete = (id) => {
+    setWorkouts(prevWorkouts => prevWorkouts.filter(workout => workout.id !== id));
+  };
+
+  return (
+    <FlatList
+      data={workouts}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.list}
+    />
+  );
 };
+
+export default function App() {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Workout Tracker</Text>
+      <WorkoutList />
+    </SafeAreaView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'black',
-    padding: 20,
+    paddingTop: 20,
+    backgroundColor: '#fff',
   },
-  text: {
-    color: 'white',
+  title: {
     fontSize: 24,
-    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  list: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  workoutItem: {
+    backgroundColor: '#f0f0f0',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  workoutName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  workoutDuration: {
+    fontSize: 14,
+    color: 'gray',
   },
 });
-
-export default App;
